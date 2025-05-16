@@ -164,3 +164,65 @@ export const getSuggestedUsers = async (req, res) => {
     console.log(error);
   }
 };
+
+export const followOrUnfollow = async (req, res) => {
+  try {
+    const followKrneWala = req.id;
+    const jiskoFollowKrunga = req.params.id;
+    if (followKrneWala === jiskoFollowKrunga) {
+      return res.status(400).json({
+        message: "Cannot follow/unfollow yourself",
+        success: false,
+      });
+    }
+
+    const user = await User.findById(followKrneWala);
+    const targetUser = await User.findById(jiskoFollowKrunga);
+
+    if (!user || !targetUser) {
+      return res.status(400).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+
+    const isFollowing = user.following.includes(jiskoFollowKrunga);
+    if (isFollowing) {
+      await Promise.all([
+        User.updateOne(
+          { _id: followKrneWala },
+          { $pull: { following: jiskoFollowKrunga } }
+        ),
+
+        User.updateOne(
+          { _id: jiskoFollowKrunga },
+          { $pull: { followers: followKrneWala } }
+        ),
+      ]);
+
+      return res.status(200).json({
+        message: "Unfollowed Succesfully!",
+        success: true,
+      });
+    } else {
+      await Promise.all([
+        User.updateOne(
+          { _id: followKrneWala },
+          { $push: { following: jiskoFollowKrunga } }
+        ),
+
+        User.updateOne(
+          { _id: jiskoFollowKrunga },
+          { $push: { followers: followKrneWala } }
+        ),
+      ]);
+
+      return res.status(200).json({
+        message: "Followed Succesfully!",
+        success: true,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
