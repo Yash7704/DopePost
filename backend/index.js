@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
   });
 });
 
-//middlewaresc
+//middlewares
 app.use(express.json());
 app.use(cookieParser());
 app.use(urlencoded({ extended: true }));
