@@ -1,6 +1,4 @@
-import conversationModel, {
-  Conversation,
-} from "../models/conversation.model.js";
+import { Conversation } from "../models/conversation.model.js";
 import { Message } from "../models/message.model.js";
 
 //For chat
