@@ -23,7 +23,7 @@ export const addNewPost = async (req, res) => {
 
     //buffer to dataUri
     const fileUri = `data:image/jpeg;base64,${optimizedImagebuffer.toString(
-      base64
+      "base64"
     )}`;
 
     const cloudResponse = await cloudinary.uploader.upload(fileUri);
@@ -75,8 +75,7 @@ export const getAllPost = async (req, res) => {
 export const getUserPost = async (req, res) => {
   try {
     const authorId = req.id;
-    const posts = await post
-      .find({ author: authorId })
+    const posts = await Post.find({ author: authorId })
       .sort({ createdAt: -1 })
       .populate({
         path: "author",
@@ -155,15 +154,13 @@ export const addComment = async (req, res) => {
         .status(400)
         .json({ message: "Text is required!", success: false });
 
-    const comment = Comment.create({
+    const comment = await Comment.create({
       text,
       author: commentKarneWalaUserKiId,
       post: postId,
-    }).populate({
-      path: "author",
-      select: "username,profilePicture",
     });
 
+    await comment.populate("author", "username , profilePicture");
     post.comments.push(comment._id);
     await post.save();
 
@@ -171,6 +168,92 @@ export const addComment = async (req, res) => {
       message: "Comment added!",
       success: true,
     });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getCommentsOfPost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const Comments = await Comment.find({ post: postId }).populate(
+      "author",
+      "username,profilePicture"
+    );
+    if (!Comments)
+      return res
+        .status(404)
+        .json({ message: "No comments found for this post!", success: false });
+
+    return res.status(200).json({ success: true, Comments });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deletePost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const authorId = req.id;
+    const post = await Post.findById(postId);
+    if (!post)
+      return res
+        .status(404)
+        .json({ message: "No posts found!", success: false });
+
+    if (post.author.toString() !== authorId) {
+      return res.status(403).json({
+        message: "Unauthorized access",
+      });
+    }
+
+    await Post.findByIdAndDelete(postId);
+
+    let user = await User.findById(authorId);
+    user.posts = user.posts.filter((id) => id.toString() !== postId);
+    await user.save();
+
+    await Comment.deleteMany({ post: postId });
+
+    return res.status(200).json({
+      message: "Post deleted!",
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const bookmarkPost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const authorId = req.id;
+    const post = await Post.findById(postId);
+    if (!post)
+      return res
+        .status(404)
+        .json({ message: "Post not found", success: false });
+
+    const user = await User.findById(authorId);
+    if (user.bookmarks.includes(post._id)) {
+      //Already bookmarked thus remove
+      await user.updateOne({ $pull: { bookmarks: post._id } });
+      await user.save();
+      return res.status(200).json({
+        type: "unsaved",
+        message: "Post removed from bookmark",
+        success: true,
+      });
+    } else {
+      //Bookmark for first time
+      await user.updateOne({ $addToSet: { bookmarks: post._id } });
+      await user.save();
+      return res.status(200).json({
+        type: "saved",
+        message: "Post bookmarked ",
+        success: true,
+      });
+    }
   } catch (error) {
     console.log(error);
   }
