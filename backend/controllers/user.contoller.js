@@ -1,6 +1,7 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
 
 export const register = async (req, res) => {
@@ -104,7 +105,7 @@ export const logout = async (_, res) => {
 export const getProfile = async (req, res) => {
   try {
     const userId = req.params.id; //Access any user irrespective of login status
-    let user = await User.findById(userId);
+    let user = await User.findById(userId).select("-password");
     return res.status(200).json({
       user,
       success: true,
@@ -125,7 +126,7 @@ export const editProfile = async (req, res) => {
       cloudResponse = await cloudinary.uploader.upload(fileUri);
     }
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select("-passwword");
     if (!user) {
       return res.status(401).json({
         message: "User not found.",
