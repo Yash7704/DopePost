@@ -1,0 +1,177 @@
+import sharp from "sharp";
+import cloudinary from "../utils/cloudinary.js";
+import { Post } from "../models/post.model.js";
+import { User } from "../models/user.model.js";
+import { Comment } from "../models/comment.model.js";
+
+export const addNewPost = async (req, res) => {
+  try {
+    const { caption } = req.body;
+    const image = req.file;
+    const authorId = req.id;
+
+    if (!image) return res.status(400).json({ message: "Image required!" });
+
+    //image upload and we will optimise it using sharp module to make image more web friendly
+    const optimizedImagebuffer = await sharp(image.buffer)
+      .resize({
+        width: 800,
+        height: 800,
+        fit: "inside",
+      })
+      .toFormat("jpeg", { quality: 80 }).toBuffer;
+
+    //buffer to dataUri
+    const fileUri = `data:image/jpeg;base64,${optimizedImagebuffer.toString(
+      base64
+    )}`;
+
+    const cloudResponse = await cloudinary.uploader.upload(fileUri);
+
+    const post = await Post.create({
+      caption,
+      image: cloudResponse.secure_url,
+      author: authorId,
+    });
+
+    const user = await User.findById(authorId);
+
+    if (user) {
+      user.posts.push(post._id);
+      await user.save();
+    }
+
+    await post.populate({ path: "author", select: "-password" });
+
+    return res.status(201).json({
+      message: "New post added!",
+      post,
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getAllPost = async (req, res) => {
+  try {
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate({ path: "author", select: "username,profilePicture" })
+      .populate({
+        path: "comments",
+        sort: { createdAt: -1 },
+        populate: { path: "author", select: "username,profilePicture" },
+      });
+    return res.status(200).json({
+      posts,
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getUserPost = async (req, res) => {
+  try {
+    const authorId = req.id;
+    const posts = await post
+      .find({ author: authorId })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "author",
+        select: "username,profilePicture",
+      })
+      .populate({
+        path: "comments",
+        sort: { createdAt: -1 },
+        populate: { path: "author", select: "username,profilePicture" },
+      });
+    return res.status(200).json({
+      posts,
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const likePost = async (req, res) => {
+  try {
+    const likeKarneWaleUserKiId = req.id;
+    const postId = req.params.id;
+    const post = await Post.findById(postId);
+    if (!post)
+      return res.status(404).json({
+        message: "Post not found",
+        success: false,
+      });
+
+    //Main like logic
+    await post.updateOne({ $addToSet: { likes: likeKarneWaleUserKiId } }); //This ensures a single user can add a single like to a post
+    await post.save();
+
+    //Implementing socket.io for real time notification
+
+    return res.status(200).json({ message: "Post liked!", success: true });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const dislikePost = async (req, res) => {
+  try {
+    const likeKarneWaleUserKiId = req.id;
+    const postId = req.params.id;
+    const post = await Post.findById(postId);
+    if (!post)
+      return res.status(404).json({
+        message: "Post not found",
+        success: false,
+      });
+
+    //Main like logic
+    await post.updateOne({ $pull: { likes: likeKarneWaleUserKiId } }); //This ensures a single user can remove like from a post
+    await post.save();
+
+    //Implementing socket.io for real time notification
+
+    return res.status(200).json({ message: "Post liked!", success: true });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addComment = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const commentKarneWalaUserKiId = req.id;
+
+    const { text } = req.body;
+
+    const post = await Post.findById(postId);
+    if (!text)
+      return res
+        .status(400)
+        .json({ message: "Text is required!", success: false });
+
+    const comment = Comment.create({
+      text,
+      author: commentKarneWalaUserKiId,
+      post: postId,
+    }).populate({
+      path: "author",
+      select: "username,profilePicture",
+    });
+
+    post.comments.push(comment._id);
+    await post.save();
+
+    return res.status(201).json({
+      message: "Comment added!",
+      success: true,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
