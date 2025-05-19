@@ -7,15 +7,18 @@ import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, TrendingUp } fr
 import React from 'react'
 import { toast } from 'sonner'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { setAuthUser } from '@/redux/authSlice'
 
 const LeftSidebar = ()=> {
     const navigate = useNavigate();
     const {user} = useSelector(store => store.auth);
+    const dispatch = useDispatch();
     const logoutHandler = async () => {
         try {
              const res = await axios.get('http://localhost:8000/api/v1/user/logout', { withCredentials: true });
             if (res.data.success) {
+                dispatch(setAuthUser(null))
                 navigate("/login");
                 toast.success(res.data.message);
             }
