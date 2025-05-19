@@ -19,7 +19,8 @@ export const addNewPost = async (req, res) => {
         height: 800,
         fit: "inside",
       })
-      .toFormat("jpeg", { quality: 80 }).toBuffer;
+      .toFormat("jpeg", { quality: 80 })
+      .toBuffer();
 
     //buffer to dataUri
     const fileUri = `data:image/jpeg;base64,${optimizedImagebuffer.toString(
@@ -27,6 +28,9 @@ export const addNewPost = async (req, res) => {
     )}`;
 
     const cloudResponse = await cloudinary.uploader.upload(fileUri);
+    if (!cloudResponse || !cloudResponse.secure_url) {
+      throw new Error("Cloudinary upload failed");
+    }
 
     const post = await Post.create({
       caption,
@@ -135,7 +139,7 @@ export const dislikePost = async (req, res) => {
 
     //Implementing socket.io for real time notification
 
-    return res.status(200).json({ message: "Post liked!", success: true });
+    return res.status(200).json({ message: "Post disliked!", success: true });
   } catch (error) {
     console.log(error);
   }
