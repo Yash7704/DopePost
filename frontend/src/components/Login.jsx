@@ -6,8 +6,8 @@ import { Button } from './ui/button'
 import axios from 'axios'
 import { toast } from 'sonner'
 
-const Signup = () => {
-    const [input,setInput] = useState({
+const Login = () => {
+    const[input,setInput] = useState({
         username: '',
         email: '',
         password: ''
@@ -25,7 +25,7 @@ const Signup = () => {
         
         try {
             setLoading(true);
-            const res = await axios.post('http://localhost:8000/api/v1/user/register',input,{
+            const res = await axios.post('http://localhost:8000/api/v1/user/login',input,{
                 headers:{
                     'Content-Type' : 'application/json'
                 },
@@ -34,7 +34,6 @@ const Signup = () => {
             if(res.data.success){
                 toast.success(res.data.message);
                 setInput({
-                     username: '',
                     email: '',
                     password: ''
                 })
@@ -53,11 +52,7 @@ const Signup = () => {
         <form onSubmit={signupHandler} className='shadow-lg flex flex-col gap-5 p-8  '>
             <div className='my-4f'>
                 <h1 className='text-center font-bold text-xl'>LOGO</h1>
-                <p className='text-sm text-center'>Signup to see the content from your homies</p>
-            </div>
-            <div>
-            <span className='py-1 font-medium' >Username</span>
-            <Input type ='text' name='username' className="focus-visible:ring-transparent" value={input.username} onChange={changeEventHandler}/>
+                <p className='text-sm text-center'>Login to your existing account</p>
             </div>
             <div>
             <span className='py-1 font-medium' >Email</span>
@@ -68,7 +63,7 @@ const Signup = () => {
             <Input type ='password' name='password' className="focus-visible:ring-transparent"  value={input.password} onChange={changeEventHandler}/>
             </div>
 
-            <Button type="submit">Signup</Button>
+            <Button type="submit">Login</Button>
             
 
         </form>
@@ -76,4 +71,4 @@ const Signup = () => {
   )
 }
 
-export default Signup
+export default Login
