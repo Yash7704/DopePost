@@ -1,18 +1,24 @@
 /* eslint-disable no-unused-vars */
 import Signup from './components/Signup.jsx'
 import Login from './components/Login.jsx'
-import home from './components/home.jsx'
+import Home from './components/Home.jsx'
 import MainLayout from './components/MainLayout.jsx'
 import { createBrowserRouter,RouterProvider } from 'react-router-dom'
+import Profile from './components/Profile.jsx'
 
 const browserRouter = createBrowserRouter([
   {
     path:'/',
-    element: '<MainLayout/>',
+    element: <MainLayout/>,
     children:[{
       path:'/',
-    element: <home/>, 
-    }]
+    element: <Home/>, 
+    },
+  {
+      path:'/profile',
+    element: <Profile/>, 
+    }
+  ]
   },
   {
     path:'/login',
