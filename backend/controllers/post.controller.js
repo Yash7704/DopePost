@@ -164,12 +164,16 @@ export const addComment = async (req, res) => {
       post: postId,
     });
 
-    await comment.populate("author", "username , profilePicture");
+    await comment.populate({
+      path: "author",
+      select: "username profilePicture",
+    });
     post.comments.push(comment._id);
     await post.save();
 
     return res.status(201).json({
       message: "Comment added!",
+      comment,
       success: true,
     });
   } catch (error) {
@@ -182,7 +186,7 @@ export const getCommentsOfPost = async (req, res) => {
     const postId = req.params.id;
     const Comments = await Comment.find({ post: postId }).populate(
       "author",
-      "username,profilePicture"
+      "username profilePicture"
     );
     if (!Comments)
       return res

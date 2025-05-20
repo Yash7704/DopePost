@@ -52,7 +52,7 @@ const LeftSidebar = ()=> {
     {icon: <Heart/>,text: "Notifications"},
     {icon: <PlusSquare/>,text: "Create"},
     {icon: ( <Avatar className ="w-6 h-6">
-      <AvatarImage src="user?.profilePicture" alt="@shadcn" />
+      <AvatarImage src={user?.profilePicture} alt="@shadcn" />
       <AvatarFallback>CN</AvatarFallback>
     </Avatar>),text: "Profile"},
     {icon: <LogOut/>,text: "Logout"},    
@@ -62,7 +62,7 @@ const LeftSidebar = ()=> {
     <div className='fixed top-0 z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen'>
 
         <div className='flex flex-col'>
-            <h1 className='my-8 pl-3 font-bold text-xl'>LOGO</h1>
+            <h1 className='my-8 pl-3 font-bold text-xl'>DOPEPOST</h1>
             <div>
                  {
             sideBarItems.map((item,index)=>{
