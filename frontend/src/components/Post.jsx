@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'sonner'
 import axios from 'axios'
 import { setPosts } from '@/redux/postSlice'
+import { setSelectedPost } from '@/redux/postSlice'
 
 function Post({post}) {
     const [text,setText] = useState("");
@@ -30,7 +31,7 @@ function Post({post}) {
     const dispatch = useDispatch();
     const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
     const [postLike, setPostLike] = useState(post.likes.length);
-
+    const [comment, setComment] = useState(post.comments);
 
     const deletePostHandler = async ()=>{
         try {
@@ -72,6 +73,33 @@ function Post({post}) {
         }
     }
 
+    const commentHandler = async () => {
+
+        try {
+            const res = await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`, { text }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true
+            });
+            console.log(res.data);
+            if (res.data.success) {
+                const updatedCommentData = [...comment, res.data.comment];
+                setComment(updatedCommentData);
+
+                const updatedPostData = posts.map(p =>
+                    p._id === post._id ? { ...p, comments: updatedCommentData } : p
+                );
+
+                dispatch(setPosts(updatedPostData));
+                toast.success(res.data.message);
+                setText("");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
   return (
     <div className='my-8 w-full max-w-sm mx-auto'>
         <div className='flex items-center justify-between'>
@@ -103,7 +131,9 @@ function Post({post}) {
                  {
                         liked ? <FaHeart onClick={likeOrDislikeHandler} size={'24'} className='cursor-pointer text-red-600' /> : <FaRegHeart onClick={likeOrDislikeHandler} size={'22px'} className='cursor-pointer hover:text-gray-600' />
                     }
-            <MessageCircle onClick={()=>setOpen(true)} className='cursor-pointer hover:text-gray-600'/>
+            <MessageCircle onClick={()=>{
+                dispatch(setSelectedPost(post));
+                setOpen(true)}} className='cursor-pointer hover:text-gray-600'/>
             <Send className='cursor-pointer hover:text-gray-600'/>
             </div>
             <Bookmark className='cursor-pointer hover:text-gray-600'/>
@@ -113,12 +143,14 @@ function Post({post}) {
                 <span className='font-medium mr-2'>{post.author?.username} </span>
                 {post.caption}
             </p>
-            <span className='cursor-pointer text-sm text-gray-400' onClick={()=>setOpen(true)}>View all 10 comments...</span>
+            <span className='cursor-pointer text-sm text-gray-400'  onClick={()=>{
+                dispatch(setSelectedPost(post));
+                setOpen(true)}}>View all {comment.length} comments...</span>
             <CommentDialog open={open} setOpen={setOpen}/>
             <div className='flex item-center justify-between'> 
                 <input type="text" placeholder='Add a comment...'  className='outline-none text-sm w-full' value={text} onChange={changeEventHandler}/>
                 {
-                    text &&<span className='text-[#3BADF8] '>Post</span>
+                    text &&<span onClick={commentHandler} className='text-[#3BADF8] cursor-pointer'>Post</span>
                 }   
             </div>
     </div>

@@ -5,6 +5,7 @@ import { Avatar,AvatarImage,AvatarFallback } from './ui/avatar'
 import { Link } from 'react-router-dom'
 import { MoreHorizontal } from 'lucide-react'
 import { Button } from './ui/button'
+import { useSelector } from 'react-redux'
 
 const CommentDialog = ({open,setOpen})=> {
     const [text,setText] = useState("");
@@ -16,27 +17,28 @@ const CommentDialog = ({open,setOpen})=> {
             setText("")
         }
     }
+    const {selectedPost} = useSelector(store=>store.post);
 const sendMessageHandler = async ()=>{
     alert(text);
 }
   return (
     <Dialog open={open}>
-        <DialogContent onInteractOutside={()=>setOpen(false)} className="max-w-3xl p-0 flex flex-col">
+        <DialogContent onInteractOutside={()=>setOpen(false)} className="max-w-4xl p-0 flex flex-col">
             <div className='flex flex-1'>
             <div className='w-1/2'>
-            <img src="https://m.media-amazon.com/images/M/MV5BMjE1ODY0NzE4N15BMl5BanBnXkFtZTcwMTY5Mzk0Mw@@._V1_FMjpg_UX1000_.jpg" alt=""  className='w-full h-full object-cover rounded-l-lg'  />
+            <img src={selectedPost?.image} alt=""  className='w-full h-full object-cover rounded-l-lg'  />
             </div>
             <div className='w-1/2 flex flex-col justify-between'>
                 <div className='flex items-center justify-between p-4'>
                     <div className='flex gap-3 items-center'>
                     <Link>
                     <Avatar>
-                        <AvatarImage src=""/>
+                        <AvatarImage src={selectedPost?.author?.profilePicture}/>
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     </Link>
                     <div>
-                        <Link className='font-semibold text-xs'>username</Link>
+                        <Link className='font-semibold text-xs'>{selectedPost?.author?.username}</Link>
                         {/* <span className='text-gray-600 text-sm'>Bio here...</span> */}
                     </div>
                     </div>
