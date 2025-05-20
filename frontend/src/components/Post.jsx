@@ -9,7 +9,10 @@ import { MessageCircle } from 'lucide-react'
 import { Send } from 'lucide-react'
 import { Bookmark } from 'lucide-react'
 import CommentDialog from './CommentDialog'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'sonner'
+import axios from 'axios'
+import { setPosts } from '@/redux/postSlice'
 
 function Post({post}) {
     const [text,setText] = useState("");
@@ -22,7 +25,25 @@ function Post({post}) {
             setText("");
         }
     }
-    const {user} = useSelector(store=>store.auth)
+    const {user} = useSelector(store=>store.auth);
+    const {posts} = useSelector(store=>store.post)
+    const dispatch = useDispatch();
+
+
+    const deletePostHandler = async ()=>{
+        try {
+            const res =  await axios.delete(`http://localhost:8000/api/v1/post/delete/${post?._id}`,{withCredentials:true})
+            if(res.data.success){
+                const updatedPostData = posts.filter((postItem)=>postItem?._id !==post?._id ) 
+                dispatch(setPosts(updatedPostData));
+                toast.success(res.data.message);
+            }
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.log(error);
+            
+        }
+    }
 
   return (
     <div className='my-8 w-full max-w-sm mx-auto'>
@@ -42,7 +63,7 @@ function Post({post}) {
                 <Button variant ="ghost" className="cursor-pointer w-fit text-[#ED4956] font-bold ">Unfollow</Button>
                 <Button variant ="ghost" className="cursor-pointer w-fit ">Add to favourites</Button>
                 {
-                    user && user?._id === post?.author._id && <Button variant ="ghost" className="cursor-pointer w-fit ">Delete</Button>
+                    user && user?._id === post?.author._id && <Button onClick={deletePostHandler} variant ="ghost" className="cursor-pointer w-fit ">Delete</Button>
                 }
              </DialogContent>
         </Dialog>
