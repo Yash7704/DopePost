@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 const SuggestedUsers = () => {
-    const { suggestedUsers } = useSelector(store => store.auth);
+     const { suggestedUsers } = useSelector(store => store.auth);
+  if (!suggestedUsers) return <div>Loading suggestions...</div>;
+  if (suggestedUsers.length === 0) return null; 
     return (
         <div className='my-10'>
             <div className='flex items-center justify-between text-sm'>
