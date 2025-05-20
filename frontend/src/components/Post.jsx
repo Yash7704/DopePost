@@ -9,6 +9,7 @@ import { MessageCircle } from 'lucide-react'
 import { Send } from 'lucide-react'
 import { Bookmark } from 'lucide-react'
 import CommentDialog from './CommentDialog'
+import { useSelector } from 'react-redux'
 
 function Post({post}) {
     const [text,setText] = useState("");
@@ -21,16 +22,17 @@ function Post({post}) {
             setText("");
         }
     }
+    const {user} = useSelector(store=>store.auth)
 
   return (
     <div className='my-8 w-full max-w-sm mx-auto'>
         <div className='flex items-center justify-between'>
             <div className='flex items-center gap-2'>
             <Avatar>
-                <AvatarImage src="" alt="post_image" />
+                <AvatarImage src={post.author?.profilePicture} alt="post_image" />
                  <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-        <h1>Username</h1>
+        <h1>{post.author?.username}</h1>
         </div>
         <Dialog >
              <DialogTrigger asChild>
@@ -39,8 +41,9 @@ function Post({post}) {
              <DialogContent className="flex flex-col items-center text-sm text-center">
                 <Button variant ="ghost" className="cursor-pointer w-fit text-[#ED4956] font-bold ">Unfollow</Button>
                 <Button variant ="ghost" className="cursor-pointer w-fit ">Add to favourites</Button>
-                <Button variant ="ghost" className="cursor-pointer w-fit ">Delete</Button>
-
+                {
+                    user && user?._id === post?.author._id && <Button variant ="ghost" className="cursor-pointer w-fit ">Delete</Button>
+                }
              </DialogContent>
         </Dialog>
         </div>
@@ -55,9 +58,9 @@ function Post({post}) {
             </div>
             <Bookmark className='cursor-pointer hover:text-gray-600'/>
             </div>  
-            <span className=' font-medium block mb-2'>69 likes</span>
+            <span className=' font-medium block mb-2'>{post.likes.length} likes</span>
             <p>
-                <span className='font-medium mr-2'>Username </span>
+                <span className='font-medium mr-2'>{post.author?.username} </span>
                 {post.caption}
             </p>
             <span className='cursor-pointer text-sm text-gray-400' onClick={()=>setOpen(true)}>View all 10 comments...</span>
