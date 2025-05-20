@@ -10,7 +10,7 @@ import { Send } from 'lucide-react'
 import { Bookmark } from 'lucide-react'
 import CommentDialog from './CommentDialog'
 
-function Post() {
+function Post({post}) {
     const [text,setText] = useState("");
     const [open,setOpen] = useState(false);
     const changeEventHandler = (e) =>{
@@ -45,7 +45,7 @@ function Post() {
         </Dialog>
         </div>
         <img className='rounded-sm my-2 w-full aspect-square object-cover'
-        src="https://m.media-amazon.com/images/M/MV5BMjE1ODY0NzE4N15BMl5BanBnXkFtZTcwMTY5Mzk0Mw@@._V1_FMjpg_UX1000_.jpg" alt="" srcset="" />
+        src={post.image} alt="" srcset="" />
 
             <div className='flex items-center justify-between my-2'>
             <div className='flex items-center gap-3'>
@@ -58,7 +58,7 @@ function Post() {
             <span className=' font-medium block mb-2'>69 likes</span>
             <p>
                 <span className='font-medium mr-2'>Username </span>
-                caption
+                {post.caption}
             </p>
             <span className='cursor-pointer text-sm text-gray-400' onClick={()=>setOpen(true)}>View all 10 comments...</span>
             <CommentDialog open={open} setOpen={setOpen}/>
