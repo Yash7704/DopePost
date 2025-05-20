@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState } from 'react'
 import { Avatar,AvatarImage,AvatarFallback } from '@radix-ui/react-avatar'
 import { Dialog,DialogTrigger,DialogContent } from './ui/dialog'
@@ -14,13 +13,14 @@ import { toast } from 'sonner'
 import axios from 'axios'
 import { setPosts } from '@/redux/postSlice'
 import { setSelectedPost } from '@/redux/postSlice'
+import { Badge } from './ui/badge'
 
 function Post({post}) {
     const [text,setText] = useState("");
     const [open,setOpen] = useState(false);
     const changeEventHandler = (e) =>{
         const inputText = e.target.value;
-        if(inputText.trim){
+        if(inputText.trim()){
                 setText(inputText);
         }else{
             setText("");
@@ -74,7 +74,6 @@ function Post({post}) {
     }
 
     const commentHandler = async () => {
-
         try {
             const res = await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`, { text }, {
                 headers: {
@@ -108,7 +107,11 @@ function Post({post}) {
                 <AvatarImage src={post.author?.profilePicture} alt="post_image" />
                  <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-        <h1>{post.author?.username}</h1>
+            <div className='flex items-center gap-3'>
+                <h1>{post.author?.username}</h1>
+                {user?._id===post.author._id && <Badge variant='secondary'>Author</Badge>}
+
+            </div>
         </div>
         <Dialog >
              <DialogTrigger asChild>
@@ -143,9 +146,14 @@ function Post({post}) {
                 <span className='font-medium mr-2'>{post.author?.username} </span>
                 {post.caption}
             </p>
-            <span className='cursor-pointer text-sm text-gray-400'  onClick={()=>{
+            {
+                comment.length > 0 && (
+                        <span className='cursor-pointer text-sm text-gray-400'  onClick={()=>{
                 dispatch(setSelectedPost(post));
                 setOpen(true)}}>View all {comment.length} comments...</span>
+                )
+            }
+            
             <CommentDialog open={open} setOpen={setOpen}/>
             <div className='flex item-center justify-between'> 
                 <input type="text" placeholder='Add a comment...'  className='outline-none text-sm w-full' value={text} onChange={changeEventHandler}/>

@@ -1,14 +1,21 @@
-/* eslint-disable no-unused-vars */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Dialog,DialogContent,DialogTrigger} from './ui/dialog'
 import { Avatar,AvatarImage,AvatarFallback } from './ui/avatar'
 import { Link } from 'react-router-dom'
 import { MoreHorizontal } from 'lucide-react'
 import { Button } from './ui/button'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import Comment from './Comment'
+import axios from 'axios'
+import { setPosts } from '@/redux/postSlice'
+import { toast } from 'sonner'
 
 const CommentDialog = ({open,setOpen})=> {
     const [text,setText] = useState("");
+    const {selectedPost,posts} = useSelector(store=>store.post);
+    const[comment,setComment] = useState([]);
+    const dispatch = useDispatch();
+    
     const changeEventHandler = (e)=>{
         const inputText = e.target.value;
         if(inputText.trim()){
@@ -17,10 +24,40 @@ const CommentDialog = ({open,setOpen})=> {
             setText("")
         }
     }
-    const {selectedPost} = useSelector(store=>store.post);
-const sendMessageHandler = async ()=>{
-    alert(text);
-}
+
+    useEffect(()=>{
+        if(selectedPost){
+            setComment(selectedPost.comments)
+        }
+    },[selectedPost])
+    
+
+const sendMessageHandler = async () => {
+        try {
+            const res = await axios.post(`http://localhost:8000/api/v1/post/${selectedPost?._id}/comment`, { text }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true
+            });
+            console.log(res.data);
+            if (res.data.success) {
+                const updatedCommentData = [...comment, res.data.comment];
+                setComment(updatedCommentData);
+
+                const updatedPostData = posts.map(p =>
+                    p._id === selectedPost._id ? { ...p, comments: updatedCommentData } : p
+                );
+
+                dispatch(setPosts(updatedPostData));
+                toast.success(res.data.message);
+                setText("");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+ 
   return (
     <Dialog open={open}>
         <DialogContent onInteractOutside={()=>setOpen(false)} className="max-w-4xl p-0 flex flex-col">
@@ -59,13 +96,15 @@ const sendMessageHandler = async ()=>{
                     </Dialog>
                 </div>
                 <hr />
-                <div    className='flex-1 overflow-y-auto max-h-96 p-4' >
-                    All comments
+                <div className='flex-1 overflow-y-auto max-h-96 p-4' >
+                   {
+                    comment.map((comment)=><Comment key={comment._id} comment={comment}/>)
+                   }
                 </div>
                 <div className='p-4'>
                     <div className='flex items-center gap-2'>
-                        <input type="text" value={text} onChange={changeEventHandler} placeholder='Add a comment...' className='w-full outline-none border border-gray-300 p-2 rounded' />
-                        <Button onClick={sendMessageHandler} variant="outline" disabled={!text.trim()}>Send</Button>
+                        <input type="text" value={text} onChange={changeEventHandler} placeholder='Add a comment...' className='w-full outline-none border border-gray-300 p-2 rounded text-sm' />
+                        <Button onClick={sendMessageHandler} variant="outline" disabled={!text.trim()} className="border-gray-300 cursor-pointer ">Send</Button>
                     </div>
 
                 </div>
