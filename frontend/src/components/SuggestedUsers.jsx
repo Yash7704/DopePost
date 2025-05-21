@@ -4,7 +4,21 @@ import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 const SuggestedUsers = () => {
-     const { suggestedUsers } = useSelector(store => store.auth);
+const { suggestedUsers } = useSelector(store => store.auth);
+
+  if (suggestedUsers === null || suggestedUsers === undefined) {
+    return <div>Loading suggestions...</div>;
+  }
+  
+  
+  if (!Array.isArray(suggestedUsers)) {
+    return null;
+  }
+  
+ 
+  if (suggestedUsers.length === 0) {
+    return null;
+  }
   if (!suggestedUsers) return <div>Loading suggestions...</div>;
   if (suggestedUsers.length === 0) return null; 
     return (
