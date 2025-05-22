@@ -14,7 +14,7 @@ import { setPosts, setSelectedPost } from '@/redux/postSlice'
 
 const LeftSidebar = ()=> {
     const navigate = useNavigate();
-    const {user} = useSelector(store => store.auth);
+    const {user} = useSelector(store=>store.auth);
     const dispatch = useDispatch();
     const [open,setOpen] = useState(false)
     const logoutHandler = async () => {

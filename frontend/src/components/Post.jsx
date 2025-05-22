@@ -99,14 +99,26 @@ function Post({post}) {
         }
     }
 
+     console.log('Avatar source:', post.author?.profilePicture);
+    console.log('Full author data:', post.author);
+
   return (
     <div className='my-8 w-full max-w-sm mx-auto'>
         <div className='flex items-center justify-between'>
             <div className='flex items-center gap-2'>
-            <Avatar>
-                <AvatarImage src={post.author?.profilePicture} alt="post_image" />
-                 <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+           <Avatar className="w-10 h-10 rounded-full border border-gray-200 overflow-hidden">
+  <AvatarImage 
+    src={post.author?.profilePicture}
+    alt={`${post.author?.username}'s profile`}
+    className="w-full h-full object-cover"
+    onError={(e) => {
+      e.target.src = '/default-avatar.png'; // Fallback image
+    }}
+  />
+  <AvatarFallback className="flex items-center justify-center bg-gray-100 text-gray-600 w-full h-full">
+    {post.author?.username?.charAt(0).toUpperCase() || 'U'}
+  </AvatarFallback>
+</Avatar>
             <div className='flex items-center gap-3'>
                 <h1>{post.author?.username}</h1>
                 {user?._id===post.author._id && <Badge variant='secondary'>Author</Badge>}
