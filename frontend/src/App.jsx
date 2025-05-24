@@ -15,26 +15,27 @@ import store from './redux/store.js'
 import { setSocket } from './redux/socketSlice.js'
 import { setOnlineUsers } from './redux/chatSlice.js'
 import { setLikeNotification } from './redux/rtnSlice.js'
+import ProtectedRoutes from './components/ProtectedRoutes.jsx'
 
 const browserRouter = createBrowserRouter([
   {
     path:'/',
-    element: <MainLayout/>,
+    element: <ProtectedRoutes><MainLayout/></ProtectedRoutes> ,
     children:[{
       path:'/',
-    element: <Home/>, 
+    element:     <ProtectedRoutes>    <Home/>      </ProtectedRoutes>, 
     },
   {
       path:'/profile/:id',
-    element: <Profile/>, 
+    element:      <ProtectedRoutes>    <Profile/>      </ProtectedRoutes>, 
     },
     {
       path:'/account/edit',
-    element: <EditProfile/>, 
+    element:    <ProtectedRoutes>    <EditProfile/>      </ProtectedRoutes>, 
     },
     {
     path:'/chat',
-    element: <ChatPage/>,
+    element:     <ProtectedRoutes>    <ChatPage/>      </ProtectedRoutes>, 
   }
   ]
   },

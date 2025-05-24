@@ -13,6 +13,7 @@ import CreatePost from './CreatePost'
 import { setPosts, setSelectedPost } from '@/redux/postSlice'
 import { Popover, PopoverTrigger, PopoverContent} from './ui/popover'
 import { Button } from './ui/button'
+import { clearNotifications } from '@/redux/rtnSlice'
 
 const LeftSidebar = ()=> {
     const navigate = useNavigate();
@@ -36,6 +37,10 @@ const LeftSidebar = ()=> {
 
     }
 
+ const handleNotificationClick = () => {
+        dispatch(clearNotifications()); // Clear notifications when clicked
+    };
+
 
 
     const sidebarHandler = (textType) =>{
@@ -49,6 +54,8 @@ const LeftSidebar = ()=> {
             navigate("/")
         }else if(textType==='Messages'){
             navigate("/chat")
+        }else if(textType==="Notifications"){
+            handleNotificationClick();
         }
     }
 
@@ -83,7 +90,7 @@ const LeftSidebar = ()=> {
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         
-                                            <Button className="rounded-full h-5 w-5 absolute bottom-6 left-6 bg-red-600 hover: bg-red-600" size='icon'>{likeNotification.length}  </Button>
+                                            <Button className="rounded-full h-5 w-5 absolute bottom-6 left-6 bg-red-600 hover: bg-red-600" size='icon'   >{likeNotification.length} </Button>
                                         
                                     </PopoverTrigger>
                                     <PopoverContent>

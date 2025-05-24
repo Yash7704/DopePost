@@ -15,8 +15,11 @@ const rtnSlice = createSlice({
         );
       }
     },
+    clearNotifications: (state) => {
+      state.likeNotification = []; // Clear all notifications
+    },
   },
 });
 
-export const { setLikeNotification } = rtnSlice.actions;
+export const { setLikeNotification, clearNotifications } = rtnSlice.actions;
 export default rtnSlice.reducer;
