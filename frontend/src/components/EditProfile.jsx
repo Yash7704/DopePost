@@ -66,7 +66,10 @@ useEffect(() => {
                 gender: res.data.user?.gender || user.gender
             };
                 dispatch(setAuthUser(updatedUserData));
-                navigate(`/profile/${user?._id}`);
+                setTimeout(() => {
+        navigate(`/profile/${user._id}`);
+      }, 100);
+                // navigate(`/profile/${user?._id}`);
                 toast.success(res.data.message);
             }
 

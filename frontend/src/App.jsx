@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-vars */
+
 import Signup from './components/Signup.jsx'
 import Login from './components/Login.jsx'
 import Home from './components/Home.jsx'
@@ -6,6 +6,7 @@ import MainLayout from './components/MainLayout.jsx'
 import { createBrowserRouter,RouterProvider } from 'react-router-dom'
 import Profile from './components/Profile.jsx'
 import EditProfile from './components/EditProfile.jsx'
+import ChatPage from './components/Chatpage.jsx'
 
 const browserRouter = createBrowserRouter([
   {
@@ -22,7 +23,11 @@ const browserRouter = createBrowserRouter([
     {
       path:'/account/edit',
     element: <EditProfile/>, 
-    }
+    },
+    {
+    path:'/chat',
+    element: <ChatPage/>,
+  }
   ]
   },
   {
@@ -32,7 +37,7 @@ const browserRouter = createBrowserRouter([
   {
     path:'/signup',
     element: <Signup/>,
-  }
+  },
 ])
 
 
