@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 
 import Signup from './components/Signup.jsx'
 import Login from './components/Login.jsx'
@@ -7,6 +8,10 @@ import { createBrowserRouter,RouterProvider } from 'react-router-dom'
 import Profile from './components/Profile.jsx'
 import EditProfile from './components/EditProfile.jsx'
 import ChatPage from './components/Chatpage.jsx'
+import {io} from "socket.io-client"
+import { useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import store from './redux/store.js'
 
 const browserRouter = createBrowserRouter([
   {
@@ -45,6 +50,18 @@ const browserRouter = createBrowserRouter([
 
 function App() {
 
+const {user} = useSelector(store=>store.auth)
+
+useEffect(()=>{
+  if(user){
+    const socketio = io('http://localhost:8000', {
+      query:{
+        userId:user?._id
+      },
+      transports:['websocket']
+    })
+  }
+},[])
   return (
     <>
       <RouterProvider router={browserRouter}/>

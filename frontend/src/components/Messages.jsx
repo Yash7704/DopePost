@@ -17,8 +17,18 @@ const Messages = ({selectedUser}) => {
             <Link to={`/profile/${selectedUser?._id}`}><Button  className="h-8 my-2" variant="secondary" >View Profile</Button></Link> 
             </div> 
         </div> 
-        <div>
-            
+        <div className='flex flex-col gap-3'>
+            {
+                [1,2,3,4].map((msg)=>{
+                    return (
+                        <div className='flex flex-col gap-3'>
+                            <div>
+                                {msg}
+                            </div>
+                        </div>
+                    )
+                })
+            }
         </div>
     </div>
   )
