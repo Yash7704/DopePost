@@ -19,7 +19,7 @@ router.route("/logout").get(logout);
 router.route("/:id/profile").get(isAuthenticated, getProfile);
 router
   .route("/profile/edit")
-  .post(isAuthenticated, upload.single("profilePicture"), editProfile); //Here we use multer middleware to handle profile picture data
+  .post(isAuthenticated, upload.single("profilePhoto"), editProfile); //Here we use multer middleware to handle profile picture data
 
 router.route("/suggested").get(isAuthenticated, getSuggestedUsers);
 router.route("/followorunfollow/:id").post(isAuthenticated, followOrUnfollow);
